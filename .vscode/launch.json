@@ -5,48 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "AC IRange checks",
-            "type": "python",
-            "request": "launch",
-            "program": "main.py",
-            "args":[
-            "C:/Users/Admiral Instruments/Downloads/AC QA tests Plus1745, 1751, 1752, 1753/Plus1753/ch1/QCTests_AC/CurrentRanges",
-            "./dummy.txt",
-            ],
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "AC Gain stage checks",
-            "type": "python",
-            "request": "launch",
-            "program": "main.py",
-            "args":[
-            "C:/Users/Matt Dion/Downloads/qa gui tests/qa gui tests/from QA GUI/Plus1745/ch1/QCTests_AC/GainStages",
-            "./sample AC data/QCGUIOutput/dummy.txt",
-            ],
-            "console": "integratedTerminal"
-        },
-        {
             "name": "Plot all",
             "type": "python",
             "request": "launch",
             "program": "SimplePlotAll.py",
             "args":[
-                //"C:/Users/Admiral Instruments/Downloads/AC QA tests Plus1745, 1751, 1752, 1753/Plus1753/ch1/QCTests_AC/CurrentRanges_relaxed parameters",
-                //"C:/Users/Admiral Instruments/Downloads/AC QA tests Plus1745, 1751, 1752, 1753/Plus1753/ch1/QCTests_AC/CurrentRanges",
-                //"C:/Users/Admiral Instruments/Downloads/AC QA tests Plus1745, 1751, 1752, 1753/Plus1753/ch1/QCTests_AC/GainStages_relaxed parameters",
-                //"C:/Users/Admiral Instruments/Downloads/AC QA tests Plus1745, 1751, 1752, 1753/Plus1753/ch1/QCTests_AC/GainStages",
-                "C:/Users/Admiral Instruments/Desktop/junk data/iterativeCalcs/set1"
-            ],
-            "console": "integratedTerminal"
-        }, 
-        {
-            "name": "searchReplaceTool",
-            "type": "python",
-            "request": "launch",
-            "program": "searchReplace.py",
-            "args":[
-            "C:/Users/Matt Dion/Downloads/qa gui tests/qa gui tests/from QA GUI",
+                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1771"
             ],
             "console": "integratedTerminal"
         },   
