@@ -114,7 +114,7 @@ if __name__ == '__main__':
             impedanceGroups: Tuple[str] = (
                 "R100milliOhm", "R1Ohm", "R10Ohm", "R100Ohm",
                 "R1kOhm", "R10kOhm", "R100kOhm",
-                "R1MOhm", "R10MOhm", "R100MOhm",
+                "R1MegaOhm", "R10MegaOhm", "R100MegaOhm",
                 "R1GOhm", "R10GOhm", "R50GOhm"
             )
 

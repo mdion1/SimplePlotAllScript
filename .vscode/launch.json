@@ -10,7 +10,10 @@
             "request": "launch",
             "program": "SimplePlotAll.py",
             "args":[
-                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1771"
+                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1773",
+                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1763",
+                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1764",
+                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1765"
             ],
             "console": "integratedTerminal"
         },   
