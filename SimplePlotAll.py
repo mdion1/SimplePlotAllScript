@@ -55,14 +55,34 @@ def plotOne(filename: str) -> None:
         canvas[1].legend()
         plt.show(block=True)
 
-def plotData_append(filename: str, canvas) -> None:
-        data: pd.DataFrame = pd.read_csv(filename)
-        frequency_str, impedance_str, phase_str = findBodeNames(data)
+def checkJsonHdr(filename: str) -> int:
+    file = open(filename, 'r')
+    data = file.readlines()
+    file.close()
 
-        shortFilename = filename.split('\\')[-1]
+    for idx, line in enumerate(data):
+        if('}' in line):
+            return idx +1
+    return 0
 
-        canvas[0].plot(data[frequency_str], data[impedance_str], label = impedance_str,linestyle='--',marker='o')
-        canvas[1].plot(data[frequency_str], data[phase_str], label = phase_str,linestyle='--',marker='o')
+def plotData_append(filename: str, canvas, isReference: bool = False) -> None:
+    
+    skipLines = checkJsonHdr(filename)
+
+    data: pd.DataFrame = pd.read_csv(filename, skiprows=skipLines)
+
+    frequency_str, impedance_str, phase_str = findBodeNames(data)
+    data = data.groupby(frequency_str).mean().reset_index()
+
+    shortFilename = filename.split('\\')[-1]
+
+    if isReference:
+
+        canvas[0].plot(data[frequency_str], data[impedance_str], label = shortFilename,linestyle='-', marker='x', color='red')
+        canvas[1].plot(data[frequency_str], data[phase_str], label = shortFilename, linestyle='-', marker='x', color='red')
+    else:
+        canvas[0].plot(data[frequency_str], data[impedance_str], label = shortFilename, linestyle='--', marker='o')
+        canvas[1].plot(data[frequency_str], data[phase_str], label = shortFilename, linestyle='--', marker='o')
 
 def plot_sequentially(rootDir: str, filterStr:str = None):
     for root, dirs, files in os.walk(rootDir):
@@ -72,14 +92,22 @@ def plot_sequentially(rootDir: str, filterStr:str = None):
             elif filterStr in name:
                 plotOne(os.path.join(root, name))
 
-def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None):
+def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotDir: str = None):
     plotList: List[str] = []
     for root, dirs, files in os.walk(rootDir):
         for name in files:
             if filterStr is None:
                 plotList.append(os.path.join(root, name))
-            elif filterStr in name:
+            elif f'{filterStr}Ohm' in name:
                 plotList.append(os.path.join(root, name))
+
+    if refPlotDir is not None:
+        for root, dirs, files in os.walk(refPlotDir):
+            for name in files:
+                if filterStr is None:
+                    plotList.append(os.path.join(root, name))
+                elif f'{filterStr}.csv' in name:
+                    plotList.append(os.path.join(root, name))
     
     if len(plotList) > 0:
         fig, canvas = plt.subplots(2)
@@ -91,7 +119,10 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None):
             canvas[0].set_xscale("log")
             canvas[1].set_xscale("log")
         for item in plotList:
-            plotData_append(item, canvas)
+            _isReference = False
+            if refPlotDir is not None:
+                _isReference = (refPlotDir in item)
+            plotData_append(item, canvas, isReference=_isReference)
         if plotTitle is not None:
             canvas[0].set_title(plotTitle)
         canvas[0].legend()
@@ -101,30 +132,35 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None):
 
 if __name__ == '__main__':
     dumbPlot = False
+    #dumbPlot = True
     sequencedPlot = True
 
-    for dirStr in argv[1:]:
+    if dumbPlot:
+        #plot_sequentially(dirStr)
+        dirStr = argv[1]
+        plot_all(dirStr)
 
-        if dumbPlot:
-            plot_sequentially(dirStr)
-            #plot_all(dirStr)
+    elif sequencedPlot:
+        for idx, arg in enumerate(argv[1::2]):
+            dirStr = argv[idx + 1]
+            RAdirStr = argv[idx + 2]
 
-        if sequencedPlot:
             #plot current ranges
-            impedanceGroups: Tuple[str] = (
-                "R100milliOhm", "R1Ohm", "R10Ohm", "R100Ohm",
-                "R1kOhm", "R10kOhm", "R100kOhm",
-                "R1MegaOhm", "R10MegaOhm", "R100MegaOhm",
-                "R1GOhm", "R10GOhm", "R50GOhm"
-            )
+            impedanceGroups: List[str] = [
+                "R100micro", "R1milli", "R15milli", "R100milli",
+                "R1", "R10", "R100",
+                "R1k", "R10k", "R100k",
+                "R1Mega", "R10Mega", "R100Mega",
+                "R1G", "R10G", "R50G"
+            ]
 
             currentRangeQADir = dirStr + '/ch1/QCTests_AC/CurrentRanges'
             gainStageQADir = dirStr + '/ch1/QCTests_AC/GainStages'
             
             for impedanceStr in impedanceGroups:
-                plot_all(currentRangeQADir, filterStr=impedanceStr, plotTitle=impedanceStr)
+                plot_all(currentRangeQADir, filterStr=impedanceStr, plotTitle=impedanceStr, refPlotDir=RAdirStr)
             
             #plot gain stages
             plot_all(gainStageQADir, plotTitle="Gain Stages")
 
-        print(f'Files in {dirStr} done plotting.')
+            print(f'Files in {dirStr} done plotting.')
