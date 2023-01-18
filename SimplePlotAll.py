@@ -127,6 +127,7 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
             canvas[0].set_title(plotTitle)
         canvas[0].legend()
         canvas[1].legend()
+        fig.canvas.toolbar.zoom()
         plt.show(block=True)
 
 
