@@ -17,5 +17,16 @@
             ],
             "console": "integratedTerminal"
         },   
+        {
+            "name": "Plot fft",
+            "type": "python",
+            "request": "launch",
+            "program": "fftCheck.py",
+            "args":[
+
+
+            ],
+            "console": "integratedTerminal"
+        },   
     ]
 }
