@@ -72,7 +72,7 @@ def plotData_append(filename: str, canvas, isReference: bool = False) -> None:
     data: pd.DataFrame = pd.read_csv(filename, skiprows=skipLines)
 
     frequency_str, impedance_str, phase_str = findBodeNames(data)
-    data = data.groupby(frequency_str).mean().reset_index()
+    data = data.groupby(frequency_str).mean(numeric_only=True).reset_index()
 
     shortFilename = filename.split('\\')[-1]
 
@@ -93,6 +93,8 @@ def plot_sequentially(rootDir: str, filterStr:str = None):
                 plotOne(os.path.join(root, name))
 
 def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotDir: str = None):
+    
+    
     plotList: List[str] = []
     for root, dirs, files in os.walk(rootDir):
         for name in files:
@@ -110,6 +112,7 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
                     plotList.append(os.path.join(root, name))
     
     if len(plotList) > 0:
+        
         fig, canvas = plt.subplots(2)
         if LOGLOG:
             canvas[0].set_xscale("log")
@@ -127,8 +130,11 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
             canvas[0].set_title(plotTitle)
         canvas[0].legend()
         canvas[1].legend()
+        figManager = plt.get_current_fig_manager()
+        #figManager.full_screen_toggle()
+        figManager.resize(2000,4000)
         fig.canvas.toolbar.zoom()
-        plt.show(block=True)
+        plt.show(block=False)
 
 
 if __name__ == '__main__':
@@ -163,5 +169,7 @@ if __name__ == '__main__':
             
             #plot gain stages
             plot_all(gainStageQADir, plotTitle="Gain Stages")
+
+            input("hello")
 
             print(f'Files in {dirStr} done plotting.')
