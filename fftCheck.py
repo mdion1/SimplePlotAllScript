@@ -46,6 +46,6 @@ if __name__ == '__main__':
     varNames: List[str] = ["Current", "Voltage"]
     for varName in varNames:
         plotfftAll(
-            ["C:/Users/Matt/Documents/Admiral Instruments/Raw EIS waveform data/Venta2500/8_12_2024 12_09 PM 900000Hz 10.9215Ohms.txt"],
+            argv[1::-2],    # all files listed in argv (skip first and last element)
             samplingFreq, varName, '\t', skiprows=6
         )

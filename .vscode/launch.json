@@ -10,10 +10,8 @@
             "request": "launch",
             "program": "SimplePlotAll.py",
             "args":[
-                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1773",
-                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1763",
-                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1764",
-                "C:/Users/Admiral Instruments/Dropbox/Squidstat Calibrations/Squidstat customer records/Plus1765"
+                "C:/Users/Matt/Dropbox/Squidstat Production Files/Squidstat calibration files - 2000 and up/Plus2522",
+                "C:/Users/Matt/repos/software_GUIs/CalibrationRunner/python-qc-scripts/ResistorArrayPCBCharacterization/LCRData/out/RA004",
             ],
             "console": "integratedTerminal"
         },   
@@ -23,8 +21,7 @@
             "request": "launch",
             "program": "fftCheck.py",
             "args":[
-
-
+                "C:/Users/Matt/Documents/Admiral Instruments/Raw EIS waveform data/Venta2500/8_12_2024 12_09 PM 900000Hz 10.9215Ohms.txt",
             ],
             "console": "integratedTerminal"
         },   
