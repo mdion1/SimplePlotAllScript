@@ -15,18 +15,37 @@ def plotfft(filename: str, samplingFreq: float, column: str, delimiter: str, ski
     plt.plot(xdata, ydata)
     plt.show(block=True)
 
-    
+def plotfftAvg(filenameList: List[str], samplingFreq: float, column: str, delimiter: str, skiprows: int = 0):
+    ydata: List = []
+    for filename in filenameList:
+        data = pd.read_csv(filename,skiprows=skiprows, delimiter=delimiter)
+        ydata.append(np.fft.fft(data[column]) / len(data[column]))
+    ydataAvg = np.mean(ydata, axis=0)
+    xdata = np.linspace(0, samplingFreq, len(data[column]))
+    fig, canvas = plt.subplots(1)
+    canvas.set_yscale("log")
+    plt.plot(xdata, ydataAvg)
+    plt.show(block=True)
 
+def plotfftAll(filenameList: List[str], samplingFreq: float, column: str, delimiter: str, skiprows: int = 0):
+    fig, canvas = plt.subplots(1)
+    canvas.set_yscale("log")
+
+    ydata: List = []
+    for filename in filenameList:
+        shortFilename = filename.split('/')[-1]
+        data = pd.read_csv(filename,skiprows=skiprows, delimiter=delimiter)
+        xdata = np.linspace(0, samplingFreq, len(data[column]))
+        ydata = np.abs(np.fft.fft(data[column])) / len(data[column])
+        plt.plot(xdata, ydata, label=shortFilename)
+    canvas.legend()
+    plt.show(block=True)
 
 if __name__ == '__main__':
-    #filename = "C:/Users/Matt Dion/Desktop/junk data/debugging 60hz noise/Plus1920 100MOhm/3_2_2023 4_01 PM 33Hz 9.97833e+07Ohms.txt"
-    filename = "C:/Users/Matt Dion/Desktop/junk data/debugging 60hz noise/Plus1894 100MOhm known bad/3_2_2023 10_50 AM 33Hz 1.00705e+08Ohms.txt"
-    samplingFreq = 511.01207432044089 * 33  # in Hz
-    #plotfft(filename, samplingFreq, "Current", '\t', skiprows=6)
-
-
-    filename = "C:/Users/Matt Dion/Desktop/junk data/debugging 60hz noise/Plus1905 1_Chronoamperometry 20230302 170457.csv"
-    #filename = "C:/Users/Matt Dion/Desktop/junk data/debugging 60hz noise/Plus1894 1_Chronoamperometry 20230302 132102.csv"
-    samplingFreq = 1.0 / 200e-6
-    plotfft(filename, samplingFreq, "Current (A)", ',')
-    
+    samplingFreq = 9.62E+05  # in Hz
+    varNames: List[str] = ["Current", "Voltage"]
+    for varName in varNames:
+        plotfftAll(
+            ["C:/Users/Matt/Documents/Admiral Instruments/Raw EIS waveform data/Venta2500/8_12_2024 12_09 PM 900000Hz 10.9215Ohms.txt"],
+            samplingFreq, varName, '\t', skiprows=6
+        )
