@@ -5,8 +5,16 @@ import os
 from typing import Tuple
 from typing import List
 
+# Globals
 LOGLOG = True
 SEMILOG = False
+LEGEND = True
+# LEGEND = False
+
+dumbPlot = False
+averageEachFreq = True
+# dumbPlot = True
+# averageEachFreq = False
 
 def findBodeNames(data: pd.DataFrame) -> Tuple[str, str, str]:
     freqHdrStr: str = ""
@@ -31,29 +39,32 @@ def findBodeNames(data: pd.DataFrame) -> Tuple[str, str, str]:
     return (freqHdrStr, ZmodHdrStr, PhaseHdrStr)
 
 def plotOne(filename: str) -> None:
-        data: pd.DataFrame = pd.read_csv(filename)
-        frequency_str, impedance_str, phase_str = findBodeNames(data)
+    global averageEachFreq
+    data: pd.DataFrame = pd.read_csv(filename)
+    frequency_str, impedance_str, phase_str = findBodeNames(data)
 
-        #Average the results
+    #Average the results
+    if averageEachFreq:
         data = data.groupby(frequency_str).mean().reset_index()
 
-        shortFilename = filename.split('\\')[-1]
+    shortFilename = filename.split('\\')[-1]
 
-        fig, canvas = plt.subplots(2)
-        canvas[0].set_title(shortFilename)
-        if LOGLOG:
-            canvas[0].set_xscale("log")
-            canvas[0].set_yscale("log")
-            canvas[1].set_xscale("log")
-        elif SEMILOG:
-            canvas[0].set_xscale("log")
-            canvas[1].set_xscale("log")
-        canvas[0].plot(data[frequency_str], data[impedance_str], label = impedance_str,linestyle='--',marker='o')
-        canvas[1].plot(data[frequency_str], data[phase_str], label = phase_str,linestyle='--',marker='o')
-        
+    fig, canvas = plt.subplots(2)
+    canvas[0].set_title(shortFilename)
+    if LOGLOG:
+        canvas[0].set_xscale("log")
+        canvas[0].set_yscale("log")
+        canvas[1].set_xscale("log")
+    elif SEMILOG:
+        canvas[0].set_xscale("log")
+        canvas[1].set_xscale("log")
+    canvas[0].plot(data[frequency_str], data[impedance_str], label = impedance_str,linestyle='--',marker='o')
+    canvas[1].plot(data[frequency_str], data[phase_str], label = phase_str,linestyle='--',marker='o')
+    
+    if LEGEND:
         canvas[0].legend()
         canvas[1].legend()
-        plt.show(block=True)
+    plt.show(block=True)
 
 def checkJsonHdr(filename: str) -> int:
     file = open(filename, 'r')
@@ -66,13 +77,14 @@ def checkJsonHdr(filename: str) -> int:
     return 0
 
 def plotData_append(filename: str, canvas, isReference: bool = False) -> None:
-    
+    global averageEachFreq
     skipLines = checkJsonHdr(filename)
 
     data: pd.DataFrame = pd.read_csv(filename, skiprows=skipLines)
 
     frequency_str, impedance_str, phase_str = findBodeNames(data)
-    data = data.groupby(frequency_str).mean(numeric_only=True).reset_index()
+    if averageEachFreq:
+        data = data.groupby(frequency_str).mean(numeric_only=True).reset_index()
 
     shortFilename = filename.split('\\')[-1]
 
@@ -128,8 +140,9 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
             plotData_append(item, canvas, isReference=_isReference)
         if plotTitle is not None:
             canvas[0].set_title(plotTitle)
-        canvas[0].legend()
-        canvas[1].legend()
+        if LEGEND:
+            canvas[0].legend()
+            canvas[1].legend()
         figManager = plt.get_current_fig_manager()
         #figManager.full_screen_toggle()
         figManager.resize(2000,4000)
@@ -138,14 +151,13 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
 
 
 if __name__ == '__main__':
-    dumbPlot = False
-    #dumbPlot = True
     sequencedPlot = True
 
     if dumbPlot:
         #plot_sequentially(dirStr)
         dirStr = argv[1]
         plot_all(dirStr)
+        input("hello")
 
     elif sequencedPlot:
         for idx, arg in enumerate(argv[1::2]):
