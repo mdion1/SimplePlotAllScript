@@ -10,8 +10,21 @@
             "request": "launch",
             "program": "SimplePlotAll.py",
             "args":[
-                "C:/Users/Matt/Dropbox/Squidstat Production Files/Squidstat calibration files - 2000 and up/Plus2522",
-                "C:/Users/Matt/repos/software_GUIs/CalibrationRunner/python-qc-scripts/ResistorArrayPCBCharacterization/LCRData/out/RA004",
+
+                /* The only input is the path to the folder containing the data files.
+                 *    For dumbPlot = False, use the parent directory for the instrument.
+                 *        Ex: "C:/Users/Calibration/Admiral Instruments Dropbox/Production/Squidstat Cal_QC 2000-2999/Plus2897"
+                 *    For dumbPlot = True, use the path to the immediate directory containing the data files.
+                 *        Ex: "C:/Users/Calibration/Admiral Instruments Dropbox/Production/Squidstat Cal_QC 2000-2999/Plus2420/ch1/raw_data/100 Ohm"
+                 *
+                 * Global variables:
+                 *    averageEachFreq: If True, average the data at each frequency. If False, plot all data points.
+                 *    LEGEND: If True, show the legend. If False, do not show the legend.
+                 *    dumbPlot: If True, plot whatever is in the directory, combined onto a single graph
+                 *              If False, look specifically for AC QC files, and divide them into groups based on resistor value.
+                 */
+
+                "C:/Users/Calibration/Admiral Instruments Dropbox/Production/Squidstat Cal_QC 2000-2999/Plus2897",
             ],
             "console": "integratedTerminal"
         },   

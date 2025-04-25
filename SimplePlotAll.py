@@ -89,9 +89,13 @@ def plotData_append(filename: str, canvas, isReference: bool = False) -> None:
     shortFilename = filename.split('\\')[-1]
 
     if isReference:
-
-        canvas[0].plot(data[frequency_str], data[impedance_str], label = shortFilename,linestyle='-', marker='x', color='red')
-        canvas[1].plot(data[frequency_str], data[phase_str], label = shortFilename, linestyle='-', marker='x', color='red')
+        expectedZCol_str = "Expected |Z| (Ohms)"
+        expectedPhaseCol_str = "Expected Phase (deg)"
+        if (not(expectedZCol_str in data.columns)) or not(expectedPhaseCol_str in data.columns):
+            print(f"Expected |Z| (Ohms) or Expected Phase (deg) not found in {filename}.")
+            return
+        canvas[0].plot(data[frequency_str], data[expectedZCol_str], label = shortFilename,linestyle='-', marker='x', color='red')
+        canvas[1].plot(data[frequency_str], data[expectedPhaseCol_str], label = shortFilename, linestyle='-', marker='x', color='red')
     else:
         canvas[0].plot(data[frequency_str], data[impedance_str], label = shortFilename, linestyle='--', marker='o')
         canvas[1].plot(data[frequency_str], data[phase_str], label = shortFilename, linestyle='--', marker='o')
@@ -104,24 +108,18 @@ def plot_sequentially(rootDir: str, filterStr:str = None):
             elif filterStr in name:
                 plotOne(os.path.join(root, name))
 
-def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotDir: str = None):
-    
+def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, plotExpectedZCol: bool = False):
     
     plotList: List[str] = []
     for root, dirs, files in os.walk(rootDir):
         for name in files:
+            # skip everything but csv files
+            if not name.endswith('.csv'):
+                continue
             if filterStr is None:
                 plotList.append(os.path.join(root, name))
             elif f'{filterStr}Ohm' in name:
                 plotList.append(os.path.join(root, name))
-
-    if refPlotDir is not None:
-        for root, dirs, files in os.walk(refPlotDir):
-            for name in files:
-                if filterStr is None:
-                    plotList.append(os.path.join(root, name))
-                elif f'{filterStr}.csv' in name:
-                    plotList.append(os.path.join(root, name))
     
     if len(plotList) > 0:
         
@@ -133,11 +131,13 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
         elif SEMILOG:
             canvas[0].set_xscale("log")
             canvas[1].set_xscale("log")
+
+        once = plotExpectedZCol # Just append one reference plot
         for item in plotList:
-            _isReference = False
-            if refPlotDir is not None:
-                _isReference = (refPlotDir in item)
-            plotData_append(item, canvas, isReference=_isReference)
+            if once:
+                once = False
+                plotData_append(item, canvas, True)
+            plotData_append(item, canvas, False)
         if plotTitle is not None:
             canvas[0].set_title(plotTitle)
         if LEGEND:
@@ -151,37 +151,34 @@ def plot_all(rootDir: str, filterStr:str = None, plotTitle: str = None, refPlotD
 
 
 if __name__ == '__main__':
-    sequencedPlot = True
+    dirStr = argv[1]
 
     if dumbPlot:
         #plot_sequentially(dirStr)
-        dirStr = argv[1]
+        
         plot_all(dirStr)
         input("hello")
 
-    elif sequencedPlot:
-        for idx, arg in enumerate(argv[1::2]):
-            dirStr = argv[idx + 1]
-            RAdirStr = argv[idx + 2]
+    else:
 
-            #plot current ranges
-            impedanceGroups: List[str] = [
-                "R100micro", "R1milli", "R15milli", "R100milli",
-                "R1", "R10", "R100",
-                "R1k", "R10k", "R100k",
-                "R1Mega", "R10Mega", "R100Mega",
-                "R1G", "R10G", "R50G"
-            ]
+        #plot current ranges
+        impedanceGroups: List[str] = [
+            "R100micro", "R1milli", "R15milli", "R100milli",
+            "R1", "R10", "R100",
+            "R1k", "R10k", "R100k",
+            "R1Mega", "R10Mega", "R100Mega",
+            "R1G", "R10G", "R50G"
+        ]
 
-            currentRangeQADir = dirStr + '/ch1/QCTests_AC/CurrentRanges'
-            gainStageQADir = dirStr + '/ch1/QCTests_AC/GainStages'
-            
-            for impedanceStr in impedanceGroups:
-                plot_all(currentRangeQADir, filterStr=impedanceStr, plotTitle=impedanceStr, refPlotDir=RAdirStr)
-            
-            #plot gain stages
-            plot_all(gainStageQADir, plotTitle="Gain Stages")
+        currentRangeQADir = dirStr + '/ch1/QCTests_AC/CurrentRanges'
+        gainStageQADir = dirStr + '/ch1/QCTests_AC/GainStages'
+        
+        for impedanceStr in impedanceGroups:
+            plot_all(currentRangeQADir, filterStr=impedanceStr, plotTitle=impedanceStr, plotExpectedZCol=True)
+        
+        #plot gain stages
+        plot_all(gainStageQADir, plotTitle="Gain Stages")
 
-            input("hello")
+        input("hello")  # because we are not using plt.show(block=True) anymore
 
-            print(f'Files in {dirStr} done plotting.')
+        print(f'Files in {dirStr} done plotting.')
